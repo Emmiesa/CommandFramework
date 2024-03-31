@@ -218,7 +218,31 @@ public class CommandFramework implements CommandExecutor {
 	}
 
 	private void defaultCommand(CommandArgs args) {
-		args.getSender().sendMessage(args.getLabel() + " is not handled! Oh noes!");
-	}
-	
+
+        String label = args.getLabel();
+        String[] parts = label.split(":");
+
+	if (args.getSender().hasPermission("A.random.permission")) {
+        //if (args.getSender().hasPermission(plugin.getInstance().getConfig().getString("command.syntax-bypass-perm"))) {
+            if (parts.length > 1) {
+                String commandToExecute = parts[1];
+
+                StringBuilder commandBuilder = new StringBuilder(commandToExecute);
+                for (String arg : args.getArgs()) {
+                    commandBuilder.append(" ").append(arg);
+                }
+                String command = commandBuilder.toString();
+
+                if (args.getSender() instanceof Player) {
+                    ((Player) args.getSender()).performCommand(command);
+                } else {
+                    args.getSender().getServer().dispatchCommand(args.getSender(), command);
+                }
+            } else {
+                args.getSender().sendMessage(CC.translate("&cMissing arguments / Wrong format or Internal error."));
+            }
+        } else {
+            //args.getSender().sendMessage(CC.translate(plugin.getInstance().getConfig().getString("command.anti-syntax-message").replace("{argument}", args.getLabel())));
+        }
+    }
 }
